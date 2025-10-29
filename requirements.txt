@@ -1,0 +1,7 @@
+numpy
+matplotlib
+Pillow
+tkintertable
+rasterio
+
+// pip install numpy matplotlib Pillow tkintertable rasterio
