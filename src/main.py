@@ -1,4 +1,3 @@
-# main.py
 # Entry point — launches GUI
 
 from src.gui import LandsatClassifierGUI

@@ -1,4 +1,3 @@
-# utils.py
 # Image reading, band stacking, normalization utilities.
 # Preferred reader: rasterio. Falls back to Pillow for simple multi-band TIFFs.
 

@@ -1,4 +1,3 @@
-# gui.py
 # Tkinter GUI for selecting R, G, NIR bands for 3 images and showing results.
 # Displays 3 classified images side-by-side and a water-area comparison bar chart.
 

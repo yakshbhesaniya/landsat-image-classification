@@ -1,4 +1,3 @@
-# area_calculator.py
 # Compute water area given a classified map (no file saving)
 
 import numpy as np

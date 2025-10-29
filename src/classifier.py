@@ -1,4 +1,3 @@
-# classifier.py
 # Manual K-means implementation for image classification into 3 classes (water, vegetation, other).
 # No sklearn, no ready-made clustering functions.
 
