@@ -158,6 +158,7 @@ class LandsatClassifierGUI:
             ax.set_yticks([])
 
         cmap = {1: (0, 0, 1), 2: (0, 0.6, 0), 3: (0.7, 0.7, 0.7)}
+        legend_labels = {1: "Water", 2: "Vegetation", 3: "Others"}
 
         for i in range(3):
             ax = self.axs[i]
@@ -193,6 +194,26 @@ class LandsatClassifierGUI:
         
         # Rotate x-axis labels if needed
         axb.tick_params(axis='x', rotation=45 if any(len(str(y)) > 10 for y in years) else 0)
+        
+        # Adjust layout to make space for legend on the left side
+        self.fig.subplots_adjust(left=0.20)
+        
+        # Add single shared legend - position it on the left side of Image 1 and Image 3
+        from matplotlib.patches import Patch
+        legend_elements = [Patch(facecolor=cmap[cls], label=legend_labels[cls]) 
+                          for cls in sorted(cmap.keys())]
+        # Position legend on the left side, vertically centered between Image 1 and Image 3
+        ax_image1 = self.axs[0]  # Top-left
+        ax_image3 = self.axs[2]  # Bottom-left
+        bbox1 = ax_image1.get_position()
+        bbox3 = ax_image3.get_position()
+        # Calculate vertical center between Image 1 and Image 3
+        center_y = (bbox1.y0 + bbox1.height + bbox3.y0) / 2
+        # Position on the left side of the figure
+        self.fig.legend(handles=legend_elements, loc='center left', 
+                       bbox_to_anchor=(0.02, center_y), fontsize=10, 
+                       framealpha=0.95, title="Classification Legend", 
+                       title_fontsize=11)
 
         self.canvas.draw()
 
