@@ -36,16 +36,23 @@ class LandsatClassifierGUI:
         top = ttk.Frame(frm)
         top.pack(fill=tk.X)
 
+        # Configure column weights for responsive layout
+        for i in range(3):
+            top.columnconfigure(i, weight=1, uniform="image_cols")
+
         # For 3 images — each with 3 band selectors
         for i in range(3):
             sub = ttk.Labelframe(top, text=f"Image {i+1}", padding=8)
             sub.grid(row=0, column=i, padx=8, pady=6, sticky="nsew")
+            
+            # Configure columns in each sub-frame for proper layout
+            sub.columnconfigure(1, weight=1)  # Entry field column should expand
 
             for j, band in enumerate(["red", "green", "nir"]):
-                ttk.Label(sub, text=f"{band.upper()} Band:").grid(row=j, column=0, sticky="e", pady=4)
-                ent = ttk.Entry(sub, textvariable=self.band_files[i][band], width=35)
-                ent.grid(row=j, column=1, padx=4)
-                ttk.Button(sub, text="Browse", command=lambda idx=i, b=band: self._browse_band(idx, b)).grid(row=j, column=2, padx=4)
+                ttk.Label(sub, text=f"{band.upper()} Band:").grid(row=j, column=0, sticky="e", pady=4, padx=(0, 4))
+                ent = ttk.Entry(sub, textvariable=self.band_files[i][band], width=20)
+                ent.grid(row=j, column=1, padx=4, sticky="ew")
+                ttk.Button(sub, text="Browse", command=lambda idx=i, b=band: self._browse_band(idx, b)).grid(row=j, column=2, padx=4, sticky="e")
 
         # Pixel resolution input and Run button
         controls = ttk.Frame(frm)
@@ -143,7 +150,9 @@ class LandsatClassifierGUI:
             self.root.config(cursor="")
 
     def _plot_results(self, classified_maps, water_areas, years):
-        for ax in self.axs:
+        # Clear only the image axes (first 3), not the bar chart
+        for i in range(3):
+            ax = self.axs[i]
             ax.clear()
             ax.set_xticks([])
             ax.set_yticks([])
@@ -162,10 +171,28 @@ class LandsatClassifierGUI:
             ax.imshow(rgb)
             ax.set_title(f"{years[i]} - Water: {water_areas[i]:.4f} sq.km")
 
+        # Enhanced bar chart with axis values
         axb = self.axs[3]
-        axb.bar(years, water_areas, color="skyblue")
-        axb.set_title("Water Area Comparison (sq.km)")
-        axb.set_ylabel("Area (sq.km)")
+        axb.clear()
+        bars = axb.bar(years, water_areas, color="skyblue", edgecolor="navy", linewidth=1.5)
+        axb.set_title("Water Area Comparison (sq.km)", fontsize=12, fontweight="bold")
+        axb.set_ylabel("Area (sq.km)", fontsize=10)
+        axb.set_xlabel("Year/Image", fontsize=10)
+        
+        # Format y-axis with proper tick marks and values
+        axb.tick_params(axis='y', labelsize=9)
+        axb.tick_params(axis='x', labelsize=9)
+        axb.grid(axis='y', alpha=0.3, linestyle='--')
+        
+        # Add value labels on top of bars
+        for bar, value in zip(bars, water_areas):
+            height = bar.get_height()
+            axb.text(bar.get_x() + bar.get_width()/2., height,
+                    f'{value:.4f}',
+                    ha='center', va='bottom', fontsize=9, fontweight='bold')
+        
+        # Rotate x-axis labels if needed
+        axb.tick_params(axis='x', rotation=45 if any(len(str(y)) > 10 for y in years) else 0)
 
         self.canvas.draw()
 
